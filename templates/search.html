@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Results - Reddit Comment Search by u/elaifiknow</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="http://www.redditstatic.com/reddit.V9giudODoh4.css" />
+    <!-- begin Internet Explorer shit -->
+    <!--[if lt IE 7]>
+      <link rel="stylesheet" href="http://www.redditstatic.com/reddit-ie6-hax.nzvIdaFFlC8.css" type="text/css" />
+    <![endif]-->
+    <!--[if lt IE 8]>
+      <link rel="stylesheet" href="http://www.redditstatic.com/reddit-ie7-hax.372dzeWThpM.css" type="text/css" />
+    <![endif]-->
+    <!--[if gte IE 9]--><!-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://www.redditstatic.com/reddit-init.en.3OrcAnw8HD8.js"></script>
+    <!--<![endif]-->
+    <!--[if lt IE 9]>
+      <script type="text/javascript" src="http://www.redditstatic.com/html5shiv.n0ysDxgy3AI.js"></script>
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      <script type="text/javascript" src="http://www.redditstatic.com/reddit-init.en.3OrcAnw8HD8.js"></script>
+    <![endif]-->
+    <!-- end Internet Explorer shit -->
+    <style type="text/css">
+        .search-times {
+            font-size: 8pt;
+            float: left;
+            margin-left: 10px;
+        }
+
+        .search-feedback {
+            float: right;
+            margin-right: 10px;
+        }
+
+        .search-no-user, .search-no-comments {
+            margin: 10px;
+            size: 15pt;
+        }
+
+        .search-main-hr {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .search-times-hr {
+            margin: 0px;
+            margin-top: 3px;
+            border: solid gray 1px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="search-main">
+      {% if results is defined %}
+      {% for result in results %}
+      <div style="display: block;" data-downs="?" data-ups="?" data-fullname="{{result[1].fullname}}" onclick="click_thing(this)" class="thing id-{{result[1].fullname}} {{result[4]}} comment">
+        <p class="parent">
+          <a name="{{result[1].id}}"></a>
+          <a href="{{result[1].submission.permalink}}" class="title" rel="nofollow">{{result[1].submission.title}}</a>  by  <a href="{{result[1].submission.author._url}}" class="author may-blank id-{{result[1].submission.author.fullname}}">{{result[1].submission.author.name}}</a><span class="userattrs">{# TODO: add support for userattrs #}</span>in  <a href="http://www.reddit.com{{result[1].submission.subreddit.url}}" class="subreddit hover">{{result[1].submission.subreddit.display_name}}</a>
+        </p>
+        <div class="midcol unvoted" style="visibility: hidden;">
+          <div class="arrow up login-required" onclick="$(this).vote(r.config.vote_hash, null, event)" role="button" aria-label="upvote" tabindex="0" pairnum="1"></div>
+          <div class="arrow down login-required" onclick="$(this).vote(r.config.vote_hash, null, event)" role="button" aria-label="downvote" tabindex="0" pairnum="1"></div>
+        </div>
+        <div class="entry unvoted">
+          <div class="collapsed" style="display: none">
+            <a href="#" class="expand" onclick="return showcomment(this)">[+]</a>
+            <a href="{{result[1].author._url}}" class="author gray may-blank id-{{result[1].author.fullname}}">{{result[1].author.name}}</a>
+            <span class="userattrs"></span>
+            <span class="score dislikes">{{result[1].score - 1}} points</span>
+            <span class="score unvoted">{{result[1].score}} points</span>
+            <span class="score likes">{{result[1].score + 1}} points</span>
+            <time title="{# TODO: 'Thu Jul 3 17:21:55 2014 UTC' #}" datetime="{# TODO: '2014-07-03T17:21:55+00:00' #}" class="live-timestamp">{# TODO: '52 minutes ago' #}</time>&nbsp;<a href="#" class="expand" onclick="return showcomment(this)">{# TODO: '(0 children)' #}</a>
+          </div>
+          <div class="noncollapsed" style="display: block;">
+            <p class="tagline">
+              <a href="#" class="expand" onclick="return hidecomment(this)">[–]</a>
+              <a href="{{result[1].author._url}}" class="author may-blank id-{{result[1].author.fullname}}">{{result[1].author.name}}</a>
+              <span class="userattrs"></span>
+              <span class="score dislikes">{{result[1].score - 1}} points</span>
+              <span class="score unvoted">{{result[1].score}} points</span>
+              <span class="score likes">{{result[1].score + 1}} points</span>
+              <time title="{# TODO: 'Thu Jul 3 17:21:55 2014 UTC' #}" datetime="{# TODO: '2014-07-03T17:21:55+00:00' #}" class="live-timestamp">{# TODO '52 minutes ago' #}</time>
+            </p>
+            <form action="#" class="usertext" onsubmit="return post_form(this, 'editusertext')" id="form-t1_cinos27a0r">
+              <input type="hidden" name="thing_id" value="{{result[1].fullname}}">
+              <div class="usertext-body may-blank-within">
+                <div class="md">
+                  <p>{{result[2]|safe}}</p>
+                </div>
+              </div>
+            </form>
+            <ul class="flat-list buttons">
+              <li class="first"><a href="{{result[1].permalink}}" class="bylink" rel="nofollow">permalink</a></li>
+              <li><a href="{{result[1].permalink}}?context=3" class="bylink" rel="nofollow">context</a></li>
+              <li class="first"><a href="{{result[1].submission.permalink}}" class="may-blank">full comments ({{result[1].submission.num_comments}})</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="child" style="display: block;"></div>
+        <div class="clearleft"></div>
+      </div>
+      {% endfor %}
+      {% if not results %}
+      <div class="search-no-comments">
+        There don't seem to be any comments matching your search
+      </div>
+      {% endif %}
+
+      {% else %}
+      <div class="search-no-user">
+        There doesn't seem to be a redditor named <a href="{{user._url}}">{{user.name}}</a>.
+        If you think this is an error, send me a PM (the link is below), and make sure to mention the username you were trying to search.
+        Also, please make sure that this error was not the cause of a typo; please check our spelling!
+      </div>
+      {% endif %}
+    </div>
+    <hr class="search-main-hr"/>
+    <div class="search-feedback">
+      <a href="http://www.reddit.com/message/compose?to=elaifiknow">
+        Questions? Comments? Feedback? Bacon? PM me
+      </a>
+    </div>
+  </body>
+</html>
