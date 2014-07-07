@@ -12,8 +12,10 @@ Installation
 ------------
 
 1.  Clone the repo and `cd` into it (duh!)
-    * `git clone git@github.com:KevOrr/snoogle`
-    * `cd snoogle`
+
+    git clone git@github.com:KevOrr/snoogle
+    cd snoogle
+
 2.  Install dependencies
     * Get [pip][pip] if you don't have it already.
     * `pip install -r requirements.txt`
