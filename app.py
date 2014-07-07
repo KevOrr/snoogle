@@ -14,7 +14,7 @@ r = praw.Reddit('Snoogle Comment Searcher v0.1 by elaifiknow')
 def main():
     response = flask.send_static_file('main.html')
     response.headers['content'] = 'text/html; charset=utf-8'
-        return response
+    return response
 
 @app.route('/search')
 def search():
