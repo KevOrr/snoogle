@@ -1,7 +1,7 @@
-import urllib, time
+import time, urllib, sys
 from html.parser import HTMLParser
-from requests.exceptions import HTTPError
 
+from requests.exceptions import HTTPError
 import praw, flask
 from bs4 import BeautifulSoup as BS
 
@@ -9,11 +9,10 @@ KEEP_SAFE = False # KEEP_SAFE ensures that all HTML in comments gets escaped
 LIMIT = 300 # Limit the number of comments fetched in `search`.
 
 app = flask.Flask(__name__)
-r = praw.Reddit('Comment Searcher for AyChihuahua v0.0 by elaifiknow')
+r = praw.Reddit('Snoogle Comment Searcher v0.1 by elaifiknow')
 
 @app.route('/')
 def main():
-    1/0
     with open('main.html') as f:
         return f.read()
 
@@ -118,4 +117,7 @@ def render_times(*times, count=None):
         return ''
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    if len(sys.argv) == 2 and sys.argv[1] == 'debug':
+        app.run('127.0.0.1', debug=True)
+    else:
+        app.run()
