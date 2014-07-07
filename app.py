@@ -5,7 +5,6 @@ from requests.exceptions import HTTPError
 import praw, flask
 from bs4 import BeautifulSoup as BS
 
-KEEP_SAFE = False # KEEP_SAFE ensures that all HTML in comments gets escaped
 LIMIT = 300 # Limit the number of comments fetched in `search`.
 
 app = flask.Flask(__name__)
@@ -13,8 +12,9 @@ r = praw.Reddit('Snoogle Comment Searcher v0.1 by elaifiknow')
 
 @app.route('/')
 def main():
-    with open('main.html') as f:
-        return f.read()
+    response = flask.send_static_file('main.html')
+    response.headers['content'] = 'text/html; charset=utf-8'
+        return response
 
 @app.route('/search')
 def search():
