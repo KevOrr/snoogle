@@ -60,11 +60,12 @@ def search():
         
         # Start rendering
         last = time.time()
-        html = profile(render_template, 'search.html', results=results)
+        # html = Profiler(render_template, 'search.html', results=results).profile_stdout()
+        html = render_template('search.html', results=results)
         time_rendering = time.time() - last
-        
+
         # Add on render times
-        soup = profile(BS, html)
+        soup = BS(html)
         times = render_times(time_fetching, time_searching, time_rendering, count=count)
 
     # Add times, prettify, and serve
@@ -147,17 +148,17 @@ class Profiler():
         self.func = func
         self.args = args
         self.kwargs = kwargs
-    
+
     def profile_file(self, filename):
         result = p.runcall(func, *self.args, **self.kwargs)
         p.dump_stats(filename)
         return result
-    
+
     def profile_stdout(self):
         result = p.runcall(func, *args, **kwargs)
         p.print_stats(sort=-1)
         return result
-    
+
 def profile_wrapper(filename=None):
     def decorator(func):
         def decorated(*args, **kwargs):
