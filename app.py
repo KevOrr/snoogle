@@ -1,57 +1,75 @@
+LIMIT = 300 # Limit the number of comments fetched in `search`.
+
 import time, urllib, sys
 from html.parser import HTMLParser
+import cProfile
 
 from requests.exceptions import HTTPError
 import praw, flask
+from flask import Flask, make_response, render_template, url_for
 from bs4 import BeautifulSoup as BS
-
-LIMIT = 300 # Limit the number of comments fetched in `search`.
 
 app = flask.Flask(__name__)
 r = praw.Reddit('Snoogle Comment Searcher v0.1 by elaifiknow')
 
+#####################
+### Begin Routing ###
+#####################
+
 @app.route('/')
 def main():
-    response = flask.send_static_file('main.html')
+    response = app.send_static_file('index.html')
     response.headers['content'] = 'text/html; charset=utf-8'
     return response
+
+##################
+# Comment Search #
+##################
 
 @app.route('/search')
 def search():
     last = time.time()
+    if 'username' not in flask.request.args or 'keywords' not in flask.request.args:
+        return flask.redirect('/')
+    else:
+        username = flask.request.args['username']
+        keywords = flask.request.args['keywords'].split()
     try:
         # Get redditor
-        user = r.get_redditor(flask.request.args['username'])
+        user = r.get_redditor(username)
     except HTTPError:
         # Redditor likely doesn't exist
-        user = {'name': flask.request.args['username'],
-                '_url': 'http://www.reddit.com/u/' \
-                        + flask.request.args['username']
+        user = {'name': username,
+                '_url': 'http://www.reddit.com/u/' + username
                }
         last = time.time()
-        soup = BS(flask.render_template('search.html', user=user))
+        soup = BS(render_template('search.html', user=user))
         times = render_times(time.time() - last)
     else:
         # Get comments
         comments = user.get_comments(limit=LIMIT)
-        time_fetching, last = time.time() - last, time.time()
+        time_fetching = time.time() - last
+        last = time.time()
 
-        # Start search
-        keywords = flask.request.args['keywords'].split()
+        # Do the search
         count, results = do_search(comments, keywords)
-        time_searching, last = time.time() - last, time.time()
+        time_searching = time.time() - last
         
         # Sort results
         results.sort(key=lambda item: item[0], reverse=True)
         
         # Start rendering
-        soup = BS(flask.render_template('search.html', results=results))
+        last = time.time()
+        html = profile(render_template, 'search.html', results=results)
         time_rendering = time.time() - last
+        
+        # Add on render times
+        soup = profile(BS, html)
         times = render_times(time_fetching, time_searching, time_rendering, count=count)
 
     # Add times, prettify, and serve
     soup.body.append(BS(times))
-    response = flask.make_response(soup.prettify())
+    response = make_response(soup.prettify())
     response.headers['content'] = 'text/html; charset=utf-8'
     return response
 
@@ -67,12 +85,14 @@ def do_search(comments, keywords):
         for keyword in keywords:
             relevancy += comment.body.lower().count(keyword.lower())
         if relevancy:
-            results.append((relevancy, comment,
+            results.append((relevancy,
+                            comment,
                             parser.unescape(comment.body_html),
-                            get_parent(comment), ['even', 'odd'][parity]))
+                            # get_parent(comment),
+                            ['even', 'odd'][parity]))
     return count, results
 
-def get_parent(comment):
+"""def get_parent(comment):
     if isinstance(comment, praw.objects.Comment):
         if comment.is_root:
             # Parent is the post, not another comment
@@ -91,6 +111,7 @@ def get_parent(comment):
                       % _name) \
                       +'If you are using your own class, please inherit from praw.objects.Comment')
         raise e
+"""
 
 def render_times(*times, count=None):
     if len(times) == 3:
@@ -113,11 +134,46 @@ def render_times(*times, count=None):
                +'</div>')
         return text.format(*times)
     else:
-        # I'm not really sure how you can get here, but it's here just in case
+        # I'm not really sure how you got here, but it's here just in case
         return ''
 
+#################################
+### Debugging/Profiling Stuff ###
+#################################
+
+class Profiler():
+    def __init__(self, func, *args, **kwargs):
+        self.p = cProfile.Profile()
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+    
+    def profile_file(self, filename):
+        result = p.runcall(func, *self.args, **self.kwargs)
+        p.dump_stats(filename)
+        return result
+    
+    def profile_stdout(self):
+        result = p.runcall(func, *args, **kwargs)
+        p.print_stats(sort=-1)
+        return result
+    
+def profile_wrapper(filename=None):
+    def decorator(func):
+        def decorated(*args, **kwargs):
+            if filename:
+                return Profiler(func, *args, **kwargs).profile_file(filename)
+            else:
+                return Profiler(func, *args, **kwargs).profile_stdout()
+        return decorated
+    return decorator
+
+############
+### MAIN ###
+############
+
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and sys.argv[1] == 'debug':
+    if 'debug' in sys.argv:
         app.run('127.0.0.1', debug=True)
     else:
-        app.run()
+        app.run(debug=False)

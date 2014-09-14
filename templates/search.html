@@ -54,7 +54,7 @@
     <div class="search-main">
       {% if results is defined %}
       {% for result in results %}
-      <div style="display: block;" data-downs="?" data-ups="?" data-fullname="{{result[1].fullname}}" onclick="click_thing(this)" class="thing id-{{result[1].fullname}} {{result[4]}} comment">
+      <div style="display: block;" data-downs="?" data-ups="?" data-fullname="{{result[1].fullname}}" onclick="click_thing(this)" class="thing id-{{result[1].fullname}} {{result[5]}} comment">
         <p class="parent">
           <a name="{{result[1].id}}"></a>
           <a href="{{result[1].submission.permalink}}" class="title" rel="nofollow">{{result[1].submission.title}}</a>  by  <a href="{{result[1].submission.author._url}}" class="author may-blank id-{{result[1].submission.author.fullname}}">{{result[1].submission.author.name}}</a><span class="userattrs">{# TODO: add support for userattrs #}</span>in  <a href="http://www.reddit.com{{result[1].submission.subreddit.url}}" class="subreddit hover">{{result[1].submission.subreddit.display_name}}</a>

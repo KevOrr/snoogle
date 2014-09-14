@@ -1,4 +1,4 @@
-templates/search.html.old
 venv/
 push.bat
 push.sh
+*.psats
