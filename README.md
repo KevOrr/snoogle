@@ -5,7 +5,8 @@ Intro
 -----
 Snoogle was built as an augmentation to the very popular link-sharing site [Reddit][Reddit].
 Although the site has incredible searching capabilites for posts, there is currently no way to search ones comments.
-Snoogle will hopefully fill that void
+Snoogle will hopefully fill that void.
+[Snoogle's current home is on Heroku][Snoogle].
 
 
 Installation
@@ -45,3 +46,4 @@ Debug Mode
 
 [pip]: http://pip.readthedocs.org/en/latest/installing.html
 [Reddit]: http://www.reddit.com
+[Snoogle]: http://snoogle.herokuapp.com
