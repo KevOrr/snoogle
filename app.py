@@ -2,7 +2,7 @@ LIMIT = 300 # Limit the number of comments fetched in `search`.
 
 import time, urllib, sys
 from html.parser import HTMLParser
-import cProfile
+import atexit, cProfile
 
 from requests.exceptions import HTTPError
 import praw, flask
@@ -28,6 +28,7 @@ def main():
 
 @app.route('/search')
 def search():
+    print('Received Search request')
     last = time.time()
     if 'username' not in flask.request.args or 'keywords' not in flask.request.args:
         return flask.redirect('/')
@@ -174,6 +175,7 @@ def profile_wrapper(filename=None):
 ############
 
 if __name__ == '__main__':
+    atexit.register(print, 'Program exited')
     if 'debug' in sys.argv:
         app.run('127.0.0.1', debug=True)
     else:
