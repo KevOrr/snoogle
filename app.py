@@ -177,4 +177,4 @@ if __name__ == '__main__':
     if 'debug' in sys.argv:
         app.run('127.0.0.1', debug=True)
     else:
-        app.run(debug=False)
+        app.run(debug=True)
