@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
+from __future__ import division
 
 LIMIT = 300 # Limit the number of comments fetched in `search`.
 
 import time, urllib, sys
-from html.parser import HTMLParser
 import atexit, cProfile
 
 from requests.exceptions import HTTPError
@@ -13,6 +14,7 @@ from bs4 import BeautifulSoup as BS
 
 app = flask.Flask(__name__)
 r = praw.Reddit('Snoogle Comment Searcher v0.1 by elaifiknow')
+r.config.decode_html_entities = True
 
 #####################
 ### Begin Routing ###
@@ -47,7 +49,7 @@ def search():
                }
         last = time.time()
         soup = BS(render_template('search.html', user=user))
-        times = render_times(time.time() - last)
+        times = render_times([time.time() - last])
     else:
         # Get comments
         comments = user.get_comments(limit=LIMIT)
@@ -58,9 +60,6 @@ def search():
         count, results = do_search(comments, keywords)
         time_searching = time.time() - last
         
-        # Sort results
-        results.sort(key=lambda item: item[0], reverse=True)
-        
         # Start rendering
         last = time.time()
         # html = Profiler(render_template, 'search.html', results=results).profile_stdout()
@@ -69,7 +68,7 @@ def search():
 
         # Add on render times
         soup = BS(html)
-        times = render_times(time_fetching, time_searching, time_rendering, count=count)
+        times = render_times((time_fetching, time_searching, time_rendering), count=count)
 
     # Add times, prettify, and serve
     soup.body.append(BS(times))
@@ -78,7 +77,6 @@ def search():
     return response
 
 def do_search(comments, keywords):
-    parser = HTMLParser()
     results = []
     parity = 1
     count = 0
@@ -91,9 +89,11 @@ def do_search(comments, keywords):
         if relevancy:
             results.append((relevancy,
                             comment,
-                            parser.unescape(comment.body_html),
+                            #html.unescape(comment.body_html),
+                            comment.body_html,
                             # get_parent(comment),
                             ['even', 'odd'][parity]))
+    results.sort(key=lambda item: item[0], reverse=True)
     return count, results
 
 """def get_parent(comment):
@@ -117,7 +117,7 @@ def do_search(comments, keywords):
         raise e
 """
 
-def render_times(*times, count=None):
+def render_times(times, count=None):
     if len(times) == 3:
         # Redditor exists, show all times
         if count is None:
@@ -177,8 +177,9 @@ def profile_wrapper(filename=None):
 ############
 
 if __name__ == '__main__':
-    atexit.register(print, 'Program exited')
     if 'debug' in sys.argv:
-        app.run('127.0.0.1', debug=True)
+        port = 5000 if len(sys.argv) < 3 else int(sys.argv[2])
+        app.run('127.0.0.1', port, debug=True)
     else:
-        app.run(debug=True)
+        port = 5000 if len(sys.argv) < 2 else int(sys.argv[1])
+        app.run(debug=False)
