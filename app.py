@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 LIMIT = 300 # Limit the number of comments fetched in `search`.
 
 import time, urllib, sys
